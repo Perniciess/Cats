@@ -1,6 +1,6 @@
 ﻿document.getElementById("getImageButton").addEventListener("click", async function() {
     const url = document.getElementById("urlInput").value;
-    const urlPattern = new RegExp('^(http|https)://[^ "]+$');
+    const urlPattern = new RegExp('^(http|https)?://[^ "]+$');
     if (!urlPattern.test(url)) {
         document.getElementById("errorText").style.display = "block";
         document.getElementById("catImage").style.display = "none";
