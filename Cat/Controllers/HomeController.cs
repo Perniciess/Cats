@@ -21,6 +21,7 @@ namespace Cat.Controllers
                 {
                     return File(imageFromCache, "image/jpeg");
                 }
+                try {
                 using (HttpClient client = new HttpClient())
                 {
                     var request = WebRequest.Create(url) as HttpWebRequest;
@@ -35,8 +36,26 @@ namespace Cat.Controllers
                     _cache.Set(cacheKey, imageBytes, cacheEntryOptions);
                     return File(imageBytes, "image/jpeg");
                 }
+                }
+                catch
+                {
+                    using (HttpClient client = new HttpClient())
+                    {
+                        var statusCode = 500;
+                        var catImageUrl = $"https://http.cat/{(int)statusCode}";
+                        var catImageResponse = await client.GetAsync(catImageUrl);
+                        var imageBytes = await catImageResponse.Content.ReadAsByteArrayAsync();
+                        var cacheEntryOptions = new MemoryCacheEntryOptions()
+                            .SetSlidingExpiration(TimeSpan.FromMinutes(60));
+                        _cache.Set(cacheKey, imageBytes, cacheEntryOptions);
+                        return File(imageBytes, "image/jpeg");
+                    }
+                }
             }
-            return null;
+            else
+            {
+                return NotFound();
+            }
         }
 
         public IActionResult Index()
